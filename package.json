@@ -1,0 +1,36 @@
+{
+  "name": "credgauge",
+  "version": "0.1.0",
+  "description": "A Node.js library and CLI for data visualization dashboards",
+  "type": "module",
+  "main": "src/index.js",
+  "bin": {
+    "credgauge": "src/cli.js"
+  },
+  "scripts": {
+    "test": "node --test"
+  },
+  "keywords": [
+    "dashboard",
+    "visualization",
+    "gauge",
+    "cli",
+    "metrics"
+  ],
+  "author": "w-zjj",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18"
+  },
+  "files": [
+    "src"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/w-zjj/credgauge.git"
+  },
+  "homepage": "https://github.com/w-zjj/credgauge#readme",
+  "bugs": {
+    "url": "https://github.com/w-zjj/credgauge/issues"
+  }
+}
