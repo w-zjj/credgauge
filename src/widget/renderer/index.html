@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>credgauge</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="widget" id="widget">
+      <header class="header">
+        <span class="title">DeepSeek 余额</span>
+        <span class="status" id="status">●</span>
+      </header>
+      <div class="main" id="main">
+        <div class="total" id="total">--</div>
+        <div class="sub" id="sub">加载中…</div>
+      </div>
+      <footer class="footer">
+        <span class="time" id="time">--:--:--</span>
+        <span class="actions">
+          <button class="btn" id="refresh-btn" title="刷新">↻</button>
+          <button class="btn" id="close-btn" title="关闭">⚙</button>
+        </span>
+      </footer>
+    </div>
+    <script src="widget.js"></script>
+  </body>
+</html>

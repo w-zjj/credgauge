@@ -1,21 +1,26 @@
 {
   "name": "credgauge",
   "version": "0.1.0",
-  "description": "A Node.js library and CLI for data visualization dashboards",
+  "description": "DeepSeek 余额监控桌面挂件（Electron + Node.js 库/CLI）",
   "type": "module",
   "main": "src/index.js",
   "bin": {
     "credgauge": "src/cli.js"
   },
   "scripts": {
+    "start": "electron src/widget/main.js",
+    "widget": "electron src/widget/main.js",
+    "balance": "node src/cli.js balance",
     "test": "node --test"
   },
   "keywords": [
+    "deepseek",
+    "balance",
+    "widget",
+    "electron",
     "dashboard",
-    "visualization",
     "gauge",
-    "cli",
-    "metrics"
+    "cli"
   ],
   "author": "w-zjj",
   "license": "MIT",
@@ -32,5 +37,8 @@
   "homepage": "https://github.com/w-zjj/credgauge#readme",
   "bugs": {
     "url": "https://github.com/w-zjj/credgauge/issues"
+  },
+  "devDependencies": {
+    "electron": "^31.0.0"
   }
 }
