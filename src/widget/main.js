@@ -44,8 +44,8 @@ async function refresh() {
 
 function createWindow() {
   win = new BrowserWindow({
-    width: 320,
-    height: 200,
+    width: 150,
+    height: 56,
     frame: false,
     transparent: true,
     resizable: false,
@@ -65,11 +65,7 @@ function createWindow() {
     refresh();
   });
 
-  // 点击 ⚙ 关闭挂件（简易退出，后续可扩展设置面板）
-  ipcMain.on("widget:close", () => {
-    app.quit();
-  });
-
+  ipcMain.on("widget:close", () => app.quit());
   ipcMain.on("widget:refresh", () => refresh());
 }
 

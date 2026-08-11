@@ -5,7 +5,8 @@
   "type": "module",
   "main": "src/index.js",
   "bin": {
-    "credgauge": "src/cli.js"
+    "credgauge": "src/cli.js",
+    "cre": "src/cre.js"
   },
   "scripts": {
     "start": "electron src/widget/main.js",

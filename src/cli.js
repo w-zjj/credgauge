@@ -20,6 +20,7 @@ function help() {
 Usage:
   credgauge balance          查询一次余额并打印
   credgauge widget           启动桌面挂件（需 Electron）
+  cre                        启动桌面挂件（简写）
   credgauge -v, --version    显示版本
   credgauge -h, --help       显示帮助
 
