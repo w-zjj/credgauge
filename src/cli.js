@@ -3,7 +3,10 @@
 import { spawn } from "node:child_process";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
+import { loadEnv } from "./env.js";
 import { getBalance, version } from "./index.js";
+
+loadEnv();
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
