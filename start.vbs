@@ -4,6 +4,6 @@ Set sh = CreateObject("WScript.Shell")
 Set fso = CreateObject("Scripting.FileSystemObject")
 here = fso.GetParentFolderName(WScript.ScriptFullName)
 sh.CurrentDirectory = here
-sh.Run "cmd /c node src\silent.js", 0, False
+sh.Run "node src\silent.js", 0, False
 Set sh = Nothing
 Set fso = Nothing
