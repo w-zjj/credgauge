@@ -66,10 +66,15 @@ npm link
 
 ### 4. 启动
 
+三种方式任选其一：
+
 ```powershell
-cre                        # 启动桌面挂件（简写，需 npm link）
+cre                        # 终端启动（简写，需 npm link，首次可交互配置）
 credgauge widget           # 等同效果
 ```
+
+- **双击启动**：在项目根目录双击 `start.vbs`，静默启动挂件（无终端窗口）
+- **开机自启**：见下方 [开机自启](#开机自启) 小节
 
 ## 命令
 
@@ -80,8 +85,23 @@ credgauge widget           # 等同效果
 | `credgauge deepseek` | 查询 DeepSeek 余额 |
 | `credgauge apinebula` | 查询 ApiNebula 余额 |
 | `credgauge all` | 查询所有已配置的服务 |
+| `credgauge autostart on` | 开启开机自启 |
+| `credgauge autostart off` | 关闭开机自启 |
+| `credgauge autostart status` | 查看开机自启状态 |
 | `credgauge -v` | 显示版本 |
 | `credgauge -h` | 显示帮助 |
+
+## 开机自启
+
+通过 Windows 启动文件夹创建 `start.vbs` 的快捷方式实现，开机后静默启动挂件。
+
+```powershell
+credgauge autostart on       # 开启（在启动文件夹创建 credgauge.lnk）
+credgauge autostart status   # 查看状态
+credgauge autostart off      # 关闭（删除快捷方式）
+```
+
+开启后快捷方式位于：`%APPDATA%\Microsoft\Windows\Start Menu\Programs\Startup\credgauge.lnk`
 
 ## 挂件说明
 
@@ -108,10 +128,12 @@ credgauge widget           # 等同效果
 ## 项目结构
 
 ```
+start.vbs                 # 双击静默启动入口（无终端窗口）
 src/
 ├── index.js              # 库入口，导出各 provider
-├── cli.js                # CLI（deepseek/apinebula/all/widget）
-├── cre.js                # `cre` 简写入口
+├── cli.js                # CLI（deepseek/apinebula/all/widget/autostart）
+├── cre.js                # `cre` 简写入口（交互式配置 + 启动）
+├── silent.js             # 静默启动入口（跳过交互，供 start.vbs / 开机自启）
 ├── env.js                # .env 加载
 ├── providers/
 │   ├── deepseek.js       # DeepSeek API 封装
