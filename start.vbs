@@ -1,4 +1,9 @@
-' 双击静默启动 credgauge 挂件（无终端窗口）
+' Silent launcher for credgauge widget (no console window)
+Dim fso, sh, here
 Set sh = CreateObject("WScript.Shell")
-sh.CurrentDirectory = CreateObject("Scripting.FileSystemObject").GetParentFolderName(WScript.ScriptFullName)
+Set fso = CreateObject("Scripting.FileSystemObject")
+here = fso.GetParentFolderName(WScript.ScriptFullName)
+sh.CurrentDirectory = here
 sh.Run "cmd /c node src\silent.js", 0, False
+Set sh = Nothing
+Set fso = Nothing
