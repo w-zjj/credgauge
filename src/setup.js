@@ -102,15 +102,23 @@ export async function runSetup() {
       }
     }
 
-    if (Object.keys(updates).length === 0) {
-      console.log("未输入任何配置，请稍后手动编辑 .env\n");
-      return false;
+    // 有新输入则写入
+    if (Object.keys(updates).length > 0) {
+      const newContent = buildEnv(existing, updates);
+      writeFileSync(ENV_PATH, newContent, "utf-8");
+      console.log("✓ 配置已写入 .env\n");
     }
 
-    // 合并并写入
-    const newContent = buildEnv(existing, updates);
-    writeFileSync(ENV_PATH, newContent, "utf-8");
-    console.log("✓ 配置已写入 .env\n");
+    // 只要至少有一个服务已配置（原有或新输入），就允许启动
+    const hasAny =
+      hasDeepSeek ||
+      hasApiNebula ||
+      updates.DEEPSEEK_API_KEY ||
+      updates.APINEBULA_TOKEN;
+    if (!hasAny) {
+      console.log("未配置任何服务，请稍后重新运行 cre 或手动编辑 .env\n");
+      return false;
+    }
     return true;
   } finally {
     rl.close();
