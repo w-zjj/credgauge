@@ -16,6 +16,14 @@ const REFRESH_INTERVAL = 60_000;
 let win = null;
 let timer = null;
 
+// 统计已配置的 provider 数量，用于窗口高度自适应
+function configuredCount() {
+  let n = 0;
+  if (process.env.DEEPSEEK_API_KEY) n++;
+  if (process.env.APINEBULA_TOKEN && process.env.APINEBULA_USER_ID) n++;
+  return n;
+}
+
 // 并发查询所有已配置的 provider，返回统一格式数组
 async function fetchAll() {
   const tasks = [];
@@ -57,9 +65,12 @@ async function refresh() {
 }
 
 function createWindow() {
+  const count = configuredCount();
+  // 0 个: 提示行 1 行; 1 个: 单行; 2 个: 双行
+  const height = count === 0 ? 56 : count === 1 ? 56 : 80;
   win = new BrowserWindow({
     width: 170,
-    height: 80,
+    height,
     frame: false,
     transparent: true,
     resizable: false,

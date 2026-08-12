@@ -10,8 +10,12 @@ function render(payload) {
   const results = payload.results || [];
   rowsEl.innerHTML = "";
 
+  // 未配置任何 provider
   if (results.length === 0) {
-    rowsEl.innerHTML = '<div class="row"><span class="dot err"></span><span class="name">未配置</span></div>';
+    const hint = document.createElement("div");
+    hint.className = "hint";
+    hint.textContent = "未配置，请运行 cre";
+    rowsEl.appendChild(hint);
     return;
   }
 

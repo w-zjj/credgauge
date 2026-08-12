@@ -4,6 +4,7 @@ import { spawn } from "node:child_process";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 import { loadEnv } from "./env.js";
+import { runSetup } from "./setup.js";
 import { getDeepSeekBalance, getApiNebulaBalance, version } from "./index.js";
 
 loadEnv();
@@ -86,7 +87,14 @@ async function cmdAll() {
   await Promise.all(tasks);
 }
 
-function cmdWidget() {
+async function cmdWidget() {
+  // 启动前检查配置，未配置则交互式引导
+  const configured = await runSetup();
+  if (!configured) {
+    console.log("未完成配置，请稍后重新运行或手动编辑 .env");
+    return;
+  }
+  loadEnv();
   const electronPath = join(__dirname, "..", "node_modules", ".bin", "electron");
   const mainFile = join(__dirname, "widget", "main.js");
   const child = spawn(electronPath, [mainFile], {
