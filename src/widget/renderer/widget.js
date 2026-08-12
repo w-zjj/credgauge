@@ -1,29 +1,38 @@
-// 渲染进程：接收余额更新并渲染 UI
-const el = {
-  status: document.getElementById("status"),
-  total: document.getElementById("total"),
-};
+// 渲染进程：接收多 provider 余额更新并渲染
+const rowsEl = document.getElementById("rows");
+
+function symbol(currency) {
+  return currency === "CNY" ? "¥" : currency === "USD" ? "$" : "";
+}
 
 function render(payload) {
   if (!payload) return;
+  const results = payload.results || [];
+  rowsEl.innerHTML = "";
 
-  if (!payload.ok) {
-    el.status.classList.add("err");
-    el.total.textContent = "--";
+  if (results.length === 0) {
+    rowsEl.innerHTML = '<div class="row"><span class="dot err"></span><span class="name">未配置</span></div>';
     return;
   }
 
-  const { isAvailable, balances } = payload.data;
-  el.status.classList.toggle("err", !isAvailable);
+  for (const r of results) {
+    const row = document.createElement("div");
+    row.className = "row";
 
-  if (balances.length === 0) {
-    el.total.textContent = "0";
-    return;
+    const dot = document.createElement("span");
+    dot.className = "dot" + (r.ok && r.available ? "" : " err");
+
+    const name = document.createElement("span");
+    name.className = "name";
+    name.textContent = r.name;
+
+    const val = document.createElement("span");
+    val.className = "val";
+    val.textContent = r.ok ? `${symbol(r.currency)}${r.balance.toFixed(2)}` : "--";
+
+    row.append(dot, name, val);
+    rowsEl.appendChild(row);
   }
-
-  const b = balances[0];
-  const symbol = b.currency === "CNY" ? "¥" : b.currency === "USD" ? "$" : "";
-  el.total.textContent = `${symbol}${b.total.toFixed(2)}`;
 }
 
 window.credgauge.onUpdate(render);

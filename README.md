@@ -1,13 +1,20 @@
 # credgauge
 
-DeepSeek 余额监控桌面挂件 —— 实时显示你的 DeepSeek API 余额。
+AI 服务余额监控桌面挂件 —— 实时显示 DeepSeek 和 ApiNebula 中转站的余额。
 
 ## 功能
 
-- 桌面置顶小挂件，实时显示 DeepSeek 余额
+- 桌面置顶小挂件，同时显示多个 AI 服务余额
 - 每 60 秒自动刷新
 - CLI 一次性查询
 - 无边框半透明 UI，可拖动
+
+## 支持的服务
+
+| 服务 | 数据源 | 需要配置 |
+|------|--------|----------|
+| DeepSeek | 官方 API `/user/balance` | `DEEPSEEK_API_KEY` |
+| ApiNebula | New API `/api/user/self` | `APINEBULA_TOKEN` + `APINEBULA_USER_ID` |
 
 ## 快速开始
 
@@ -19,14 +26,22 @@ cd credgauge
 npm install
 ```
 
-### 2. 配置 API Key
+### 2. 配置
 
 ```powershell
 Copy-Item .env.example .env
-# 编辑 .env 填入你的 DeepSeek API Key
+# 编辑 .env 填入你的凭证
 ```
 
-获取 API Key：https://platform.deepseek.com
+#### DeepSeek 配置
+- 获取 API Key：https://platform.deepseek.com
+- 填入 `DEEPSEEK_API_KEY=sk-xxx`
+
+#### ApiNebula 配置
+- 控制台：https://apinebula.ai/zh/console
+- `APINEBULA_TOKEN`：个人中心生成的**系统令牌**（非 API Key）
+- `APINEBULA_USER_ID`：个人中心查看的用户 ID
+- `APINEBULA_BASE_URL`：默认 `https://apinebula.ai`，一般不用改
 
 ### 3. 全局安装（可选）
 
@@ -34,14 +49,11 @@ Copy-Item .env.example .env
 npm link
 ```
 
-全局安装后可在任意目录使用 `cre` / `credgauge` 命令。
-
 ### 4. 启动
 
 ```powershell
 cre                        # 启动桌面挂件（简写，需 npm link）
 credgauge widget           # 等同效果
-credgauge balance          # 一次性查询余额
 ```
 
 ## 命令
@@ -50,16 +62,25 @@ credgauge balance          # 一次性查询余额
 |------|------|
 | `cre` | 启动桌面挂件（简写） |
 | `credgauge widget` | 启动桌面挂件 |
-| `credgauge balance` | 查询一次余额并打印 |
+| `credgauge deepseek` | 查询 DeepSeek 余额 |
+| `credgauge apinebula` | 查询 ApiNebula 余额 |
+| `credgauge all` | 查询所有已配置的服务 |
 | `credgauge -v` | 显示版本 |
 | `credgauge -h` | 显示帮助 |
 
 ## 挂件说明
 
-启动后挂件会以半透明小窗置顶显示在桌面：
+挂件以半透明小窗置顶显示在桌面，每个服务一行：
 
-- 状态点：绿色 = 可用，红色 = 不可用
-- 余额数字：总余额（含赠金和充值）
+```
+┌──────────────────────────┐
+│ ● DeepSeek    ¥0.39      │
+│ ● ApiNebula  ¥12.50      │
+│                      ×   │
+└──────────────────────────┘
+```
+
+- 状态点：绿色 = 可用，红色 = 不可用/查询失败
 - 窗口可拖动到任意位置
 - 点击右上角 × 关闭
 
@@ -67,29 +88,30 @@ credgauge balance          # 一次性查询余额
 
 - Node.js 18+ (ESM)
 - Electron（桌面挂件）
-- DeepSeek API (`/user/balance`)
-- 零运行时依赖
+- 零运行时依赖（用 Node 内置 fetch）
 
 ## 项目结构
 
 ```
 src/
-├── index.js          # 库入口
-├── client.js         # DeepSeek API 封装
-├── cli.js            # CLI（balance/widget 命令）
-├── cre.js            # `cre` 简写入口
-├── env.js            # .env 加载
+├── index.js              # 库入口，导出各 provider
+├── cli.js                # CLI（deepseek/apinebula/all/widget）
+├── cre.js                # `cre` 简写入口
+├── env.js                # .env 加载
+├── providers/
+│   ├── deepseek.js       # DeepSeek API 封装
+│   └── apinebula.js      # ApiNebula (New API) 封装
 └── widget/
-    ├── main.js       # Electron 主进程
-    ├── preload.js    # IPC 桥
-    └── renderer/     # 挂件 UI（HTML/CSS/JS）
+    ├── main.js           # Electron 主进程（并发查询多 provider）
+    ├── preload.js        # IPC 桥
+    └── renderer/         # 挂件 UI（HTML/CSS/JS）
 ```
 
 ## 开发
 
 ```powershell
-npm start             # 启动挂件（开发）
-npm run balance       # CLI 查询余额
+npm start                 # 启动挂件（开发）
+npm run balance           # CLI 查询
 ```
 
 ## License

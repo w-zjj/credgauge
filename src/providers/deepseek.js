@@ -1,19 +1,15 @@
-// DeepSeek API 客户端封装
-
+// DeepSeek API 客户端
 const BALANCE_URL = "https://api.deepseek.com/user/balance";
 
 /**
  * 查询 DeepSeek 账户余额
  * @param {string} apiKey - DeepSeek API Key (sk-xxx)
- * @returns {Promise<{isAvailable: boolean, balances: Array<{currency: string, total: number, granted: number, toppedUp: number}>}>}
+ * @returns {Promise<{name: string, balance: number, currency: string, available: boolean}>}
  */
 export async function getBalance(apiKey) {
-  if (!apiKey) {
-    throw new Error("Missing DEEPSEEK_API_KEY");
-  }
+  if (!apiKey) throw new Error("Missing DEEPSEEK_API_KEY");
 
   const res = await fetch(BALANCE_URL, {
-    method: "GET",
     headers: {
       Authorization: `Bearer ${apiKey}`,
       Accept: "application/json",
@@ -26,14 +22,12 @@ export async function getBalance(apiKey) {
   }
 
   const data = await res.json();
+  const b = (data.balance_infos || [])[0] || {};
 
   return {
-    isAvailable: data.is_available,
-    balances: (data.balance_infos || []).map((b) => ({
-      currency: b.currency,
-      total: Number(b.total_balance),
-      granted: Number(b.granted_balance),
-      toppedUp: Number(b.topped_up_balance),
-    })),
+    name: "DeepSeek",
+    balance: Number(b.total_balance || 0),
+    currency: b.currency || "CNY",
+    available: data.is_available ?? true,
   };
 }

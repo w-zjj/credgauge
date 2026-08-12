@@ -1,41 +1,55 @@
-// Electron 主进程：创建挂件窗口 + 定时轮询 DeepSeek API
+// Electron 主进程：创建挂件窗口 + 定时轮询多个 AI 服务余额
 import { app, BrowserWindow, ipcMain } from "electron";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 import { loadEnv } from "../env.js";
-import { getBalance } from "../client.js";
+import { getBalance as getDeepSeekBalance } from "../providers/deepseek.js";
+import { getBalance as getApiNebulaBalance } from "../providers/apinebula.js";
 
 loadEnv();
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-const REFRESH_INTERVAL = 60_000; // 60 秒
+const REFRESH_INTERVAL = 60_000;
 
 let win = null;
 let timer = null;
 
-// 从环境变量或持久化存储读取 API Key
-function getApiKey() {
-  return process.env.DEEPSEEK_API_KEY || "";
+// 并发查询所有已配置的 provider，返回统一格式数组
+async function fetchAll() {
+  const tasks = [];
+
+  if (process.env.DEEPSEEK_API_KEY) {
+    tasks.push(
+      getDeepSeekBalance(process.env.DEEPSEEK_API_KEY)
+        .then((r) => ({ ...r, ok: true }))
+        .catch((e) => ({ name: "DeepSeek", ok: false, error: e.message, balance: 0, currency: "CNY", available: false }))
+    );
+  }
+
+  if (process.env.APINEBULA_TOKEN && process.env.APINEBULA_USER_ID) {
+    tasks.push(
+      getApiNebulaBalance({
+        baseUrl: process.env.APINEBULA_BASE_URL || "https://apinebula.ai",
+        token: process.env.APINEBULA_TOKEN,
+        userId: process.env.APINEBULA_USER_ID,
+      })
+        .then((r) => ({ ...r, ok: true }))
+        .catch((e) => ({ name: "ApiNebula", ok: false, error: e.message, balance: 0, currency: "CNY", available: false }))
+    );
+  }
+
+  return Promise.all(tasks);
 }
 
 async function refresh() {
-  const apiKey = getApiKey();
-  if (!apiKey) {
-    win?.webContents.send("balance:update", {
-      ok: false,
-      error: "未配置 API Key",
-      ts: Date.now(),
-    });
-    return;
-  }
   try {
-    const data = await getBalance(apiKey);
-    win?.webContents.send("balance:update", { ok: true, data, ts: Date.now() });
+    const results = await fetchAll();
+    win?.webContents.send("balance:update", { results, ts: Date.now() });
   } catch (e) {
     win?.webContents.send("balance:update", {
-      ok: false,
+      results: [],
       error: e.message,
       ts: Date.now(),
     });
@@ -44,8 +58,8 @@ async function refresh() {
 
 function createWindow() {
   win = new BrowserWindow({
-    width: 150,
-    height: 56,
+    width: 170,
+    height: 80,
     frame: false,
     transparent: true,
     resizable: false,
